@@ -41,7 +41,8 @@ def index(request: Request) -> HTMLResponse:
 
 
 SEND_EMAIL_PATTERN = re.compile(
-    r"send email to\\s+(?P<to>[^\\s]+)"
+    r"send email"
+    r"(?:\\s+to\\s+(?P<to>[^\\s]+))?"
     r"(?:\\s+subject\\s+(?P<subject>.+?))?"
     r"(?:\\s+(?:body|message)\\s+(?P<body>.+))?$",
     re.IGNORECASE | re.DOTALL,
@@ -60,13 +61,14 @@ def parse_chat_intent(message: str) -> Optional[Dict[str, str]]:
         subject = send_match.group("subject") or ""
         body = send_match.group("body") or ""
         if not body:
-            remainder = message[send_match.end("to") :].strip()
+            to_end = send_match.end("to") if send_match.group("to") else None
+            remainder = message[to_end:].strip() if to_end else ""
             if remainder.lower().startswith("subject"):
                 remainder = remainder[len("subject") :].strip()
             body = remainder
         return {
             "intent": "send_email",
-            "to": send_match.group("to").strip(),
+            "to": (send_match.group("to") or "").strip(),
             "subject": subject.strip(),
             "body": body.strip(),
         }
@@ -144,6 +146,21 @@ def chat(payload: Dict[str, Any]) -> Dict[str, Any]:
     try:
         intent = parse_chat_intent(message)
         if intent and intent["intent"] == "send_email":
+            missing_fields = []
+            if not intent["to"]:
+                missing_fields.append("to address")
+            if not intent["subject"]:
+                missing_fields.append("subject")
+            if not intent["body"]:
+                missing_fields.append("message body")
+            if missing_fields:
+                return {
+                    "reply": (
+                        "Please provide the following to send the email: "
+                        + ", ".join(missing_fields)
+                        + "."
+                    )
+                }
             mcp = GoogleWorkspaceMCP(WorkspaceConfig.from_env())
             return {
                 "reply": "Email request received.",
