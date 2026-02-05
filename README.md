@@ -17,9 +17,6 @@ pip install -r requirements.txt
 
 - `OPENAI_API_KEY` / `OPENAI_MODEL` (required for OpenAI chat; set in your system env)
 - `GEMINI_API_KEY` / `GEMINI_MODEL` (required for Gemini chat; set in your system env)
-- OPENAI_API_KEY / OPENAI_MODEL (required for OpenAI chat; set in your system env)
-- GEMINI_API_KEY / GEMINI_MODEL (required for Gemini chat; set in your system env)
-
 - `GOOGLE_WORKSPACE_CLIENT_EMAIL`
 - `GOOGLE_WORKSPACE_PRIVATE_KEY`
 - `GOOGLE_WORKSPACE_DELEGATED_USER`
@@ -33,3 +30,17 @@ uvicorn app:app --host 0.0.0.0 --port 8000
 ```
 
 Open http://localhost:8000.
+
+## Chat commands
+
+You can send email commands directly in the chat box using this format:
+
+```
+send email to recipient@example.com subject Hello body This is the message.
+```
+
+To delete a message by ID:
+
+```
+delete email MESSAGE_ID
+```

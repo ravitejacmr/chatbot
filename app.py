@@ -1,4 +1,5 @@
 import os
+import re
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
 
@@ -37,6 +38,34 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request) -> HTMLResponse:
     return templates.TemplateResponse("index.html", {"request": request})
+
+
+SEND_EMAIL_PATTERN = re.compile(
+    r"send email to\\s+(?P<to>[^\\s]+)\\s+subject\\s+(?P<subject>.+?)\\s+body\\s+(?P<body>.+)",
+    re.IGNORECASE | re.DOTALL,
+)
+
+DELETE_EMAIL_PATTERN = re.compile(
+    r"delete email\\s+(?P<message_id>[\\w-]+)", re.IGNORECASE
+)
+
+
+def parse_chat_intent(message: str) -> Optional[Dict[str, str]]:
+    send_match = SEND_EMAIL_PATTERN.search(message)
+    if send_match:
+        return {
+            "intent": "send_email",
+            "to": send_match.group("to").strip(),
+            "subject": send_match.group("subject").strip(),
+            "body": send_match.group("body").strip(),
+        }
+    delete_match = DELETE_EMAIL_PATTERN.search(message)
+    if delete_match:
+        return {
+            "intent": "delete_email",
+            "message_id": delete_match.group("message_id").strip(),
+        }
+    return None
 
 
 def build_chat_response(provider: str, message: str, config: ChatConfig) -> Dict[str, Any]:
@@ -95,6 +124,23 @@ def chat(payload: Dict[str, Any]) -> Dict[str, Any]:
     if not message:
         raise HTTPException(status_code=400, detail="Message is required.")
     try:
+        intent = parse_chat_intent(message)
+        if intent and intent["intent"] == "send_email":
+            mcp = GoogleWorkspaceMCP(WorkspaceConfig.from_env())
+            return {
+                "reply": "Email request received.",
+                "action": mcp.send_email(
+                    to_address=intent["to"],
+                    subject=intent["subject"],
+                    body=intent["body"],
+                ),
+            }
+        if intent and intent["intent"] == "delete_email":
+            mcp = GoogleWorkspaceMCP(WorkspaceConfig.from_env())
+            return {
+                "reply": "Delete request received.",
+                "action": mcp.delete_email(message_id=intent["message_id"]),
+            }
         return build_chat_response(provider, message, ChatConfig.from_env())
     except HTTPException as exc:
         return JSONResponse(status_code=exc.status_code, content={"error": exc.detail})

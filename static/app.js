@@ -44,6 +44,9 @@ chatForm.addEventListener("submit", async (event) => {
     const data = await response.json();
     placeholder.textContent =
       data.reply || data.error || data.detail || "No response.";
+    if (data.action) {
+      appendBubble(JSON.stringify(data.action, null, 2), "bot");
+    }
   } catch (error) {
     placeholder.textContent = "Failed to reach the chat service.";
   }
