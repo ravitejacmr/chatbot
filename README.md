@@ -17,9 +17,12 @@ pip install -r requirements.txt
 
 - `OPENAI_API_KEY` / `OPENAI_MODEL` (required for OpenAI chat; set in your system env)
 - `GEMINI_API_KEY` / `GEMINI_MODEL` (required for Gemini chat; set in your system env)
-- `GOOGLE_WORKSPACE_CLIENT_EMAIL`
-- `GOOGLE_WORKSPACE_PRIVATE_KEY`
-- `GOOGLE_WORKSPACE_DELEGATED_USER`
+- `GOOGLE_OAUTH_CLIENT_ID` (required for OAuth email actions)
+- `GOOGLE_OAUTH_CLIENT_SECRET` (required for OAuth email actions)
+- `GOOGLE_OAUTH_TOKEN_FILE` (optional; defaults to `token.json`)
+- `GOOGLE_WORKSPACE_CLIENT_EMAIL` (service-account option)
+- `GOOGLE_WORKSPACE_PRIVATE_KEY` (service-account option)
+- `GOOGLE_WORKSPACE_DELEGATED_USER` (service-account option)
 
 ## Run
 
@@ -55,3 +58,10 @@ List emails (optional query):
 list emails
 list emails from:me
 ```
+
+## Gmail OAuth setup (client ID + secret)
+
+1. Create an OAuth client ID in Google Cloud Console (Desktop app).
+2. Set `GOOGLE_OAUTH_CLIENT_ID` and `GOOGLE_OAUTH_CLIENT_SECRET`.
+3. Start the app and run any chat command that sends/list/deletes emails.
+4. A browser window will open for consent and store a token in `token.json`.
