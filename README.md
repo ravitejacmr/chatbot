@@ -37,6 +37,9 @@ Send email directly in chat:
 
 ```
 send email to recipient@example.com subject Hello body This is the message.
+send email to recipient@example.com body This is the message.
+send email to recipient@example.com message This is the message.
+send email to recipient@example.com This is the message.
 ```
 
 Delete a message by ID:

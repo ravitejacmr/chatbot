@@ -41,7 +41,9 @@ def index(request: Request) -> HTMLResponse:
 
 
 SEND_EMAIL_PATTERN = re.compile(
-    r"send email to\\s+(?P<to>[^\\s]+)\\s+subject\\s+(?P<subject>.+?)\\s+body\\s+(?P<body>.+)",
+    r"send email to\\s+(?P<to>[^\\s]+)"
+    r"(?:\\s+subject\\s+(?P<subject>.+?))?"
+    r"(?:\\s+(?:body|message)\\s+(?P<body>.+))?$",
     re.IGNORECASE | re.DOTALL,
 )
 
@@ -55,11 +57,18 @@ LIST_EMAILS_PATTERN = re.compile(r"list emails(?:\\s+(?P<query>.+))?$", re.IGNOR
 def parse_chat_intent(message: str) -> Optional[Dict[str, str]]:
     send_match = SEND_EMAIL_PATTERN.search(message)
     if send_match:
+        subject = send_match.group("subject") or ""
+        body = send_match.group("body") or ""
+        if not body:
+            remainder = message[send_match.end("to") :].strip()
+            if remainder.lower().startswith("subject"):
+                remainder = remainder[len("subject") :].strip()
+            body = remainder
         return {
             "intent": "send_email",
             "to": send_match.group("to").strip(),
-            "subject": send_match.group("subject").strip(),
-            "body": send_match.group("body").strip(),
+            "subject": subject.strip(),
+            "body": body.strip(),
         }
     delete_match = DELETE_EMAIL_PATTERN.search(message)
     if delete_match:
