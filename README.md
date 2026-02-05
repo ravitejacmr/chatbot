@@ -15,8 +15,9 @@ pip install -r requirements.txt
 
 ## Environment variables (system env)
 
-- `OPENAI_API_KEY` / `OPENAI_MODEL` (required for OpenAI chat; set in your system env)
-- `GEMINI_API_KEY` / `GEMINI_MODEL` (required for Gemini chat; set in your system env)
+- OPENAI_API_KEY / OPENAI_MODEL (required for OpenAI chat; set in your system env)
+- GEMINI_API_KEY / GEMINI_MODEL (required for Gemini chat; set in your system env)
+
 - `GOOGLE_WORKSPACE_CLIENT_EMAIL`
 - `GOOGLE_WORKSPACE_PRIVATE_KEY`
 - `GOOGLE_WORKSPACE_DELEGATED_USER`
