@@ -34,6 +34,9 @@ chatForm.addEventListener("submit", async (event) => {
     if (data.action) {
       appendBubble(JSON.stringify(data.action, null, 2), "bot");
     }
+    if (data.detail && !data.reply) {
+      appendBubble(`Error detail: ${data.detail}`, "bot");
+    }
   } catch (error) {
     placeholder.textContent = "Failed to reach the chat service.";
   }

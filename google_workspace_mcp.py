@@ -161,7 +161,11 @@ class GoogleWorkspaceMCP:
             )
             return {"status": "sent", "message_id": result.get("id", "")}
         except HttpError as exc:
-            return {"status": "error", "message": f"Gmail API error: {exc}"}
+            return {
+                "status": "error",
+                "message": "Gmail API error.",
+                "detail": str(exc),
+            }
 
     def _delete_email_oauth(self, message_id: str) -> Dict[str, str]:
         try:
@@ -169,7 +173,11 @@ class GoogleWorkspaceMCP:
             service.users().messages().delete(userId="me", id=message_id).execute()
             return {"status": "deleted", "message_id": message_id}
         except HttpError as exc:
-            return {"status": "error", "message": f"Gmail API error: {exc}"}
+            return {
+                "status": "error",
+                "message": "Gmail API error.",
+                "detail": str(exc),
+            }
 
     def _list_emails_oauth(
         self, query: Optional[str] = None
@@ -206,4 +214,4 @@ class GoogleWorkspaceMCP:
                 )
             return {"emails": messages, "query": query or ""}
         except HttpError as exc:
-            return {"emails": [], "error": f"Gmail API error: {exc}"}
+            return {"emails": [], "error": "Gmail API error.", "detail": str(exc)}

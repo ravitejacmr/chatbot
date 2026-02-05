@@ -185,10 +185,13 @@ def chat(payload: Dict[str, Any]) -> Dict[str, Any]:
         return build_chat_response(provider, message, ChatConfig.from_env())
     except HTTPException as exc:
         return JSONResponse(status_code=exc.status_code, content={"error": exc.detail})
-    except requests.RequestException:
+    except requests.RequestException as exc:
         return JSONResponse(
             status_code=502,
-            content={"error": "Upstream chat provider request failed."},
+            content={
+                "error": "Upstream chat provider request failed.",
+                "detail": str(exc),
+            },
         )
 
 
