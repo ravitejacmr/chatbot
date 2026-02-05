@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Workspace MCP Assistant</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Google Workspace MCP</p>
+          <h1>Chat-driven email operations</h1>
+          <p class="subtitle">
+            Use OpenAI or Gemini for responses, then trigger send/delete actions.
+          </p>
+        </div>
+        <div class="provider">
+          <label for="provider">Chat provider</label>
+          <select id="provider">
+            <option value="openai">OpenAI</option>
+            <option value="gemini">Gemini</option>
+          </select>
+        </div>
+      </header>
+
+      <section class="grid">
+        <div class="card chat">
+          <h2>Chat</h2>
+          <div id="chat-log" class="chat-log"></div>
+          <form id="chat-form" class="chat-form">
+            <input
+              id="chat-input"
+              type="text"
+              placeholder="Ask about sending or deleting emails..."
+              required
+            />
+            <button type="submit">Send</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Send email</h2>
+          <form id="send-form" class="stack">
+            <input id="send-to" type="email" placeholder="To" required />
+            <input id="send-subject" type="text" placeholder="Subject" required />
+            <textarea id="send-body" placeholder="Email body" required></textarea>
+            <button type="submit">Queue email</button>
+          </form>
+          <pre id="send-output" class="output"></pre>
+        </div>
+
+        <div class="card">
+          <h2>Delete email</h2>
+          <form id="delete-form" class="stack">
+            <input id="delete-id" type="text" placeholder="Message ID" required />
+            <button type="submit">Delete</button>
+          </form>
+          <pre id="delete-output" class="output"></pre>
+        </div>
+
+        <div class="card">
+          <h2>Recent emails</h2>
+          <form id="list-form" class="stack">
+            <input id="list-query" type="text" placeholder="Search query" />
+            <button type="submit">Refresh list</button>
+          </form>
+          <ul id="list-output" class="email-list"></ul>
+        </div>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
