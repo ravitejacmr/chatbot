@@ -42,7 +42,8 @@ chatForm.addEventListener("submit", async (event) => {
       }),
     });
     const data = await response.json();
-    placeholder.textContent = data.reply || data.error || "No response.";
+    placeholder.textContent =
+      data.reply || data.error || data.detail || "No response.";
   } catch (error) {
     placeholder.textContent = "Failed to reach the chat service.";
   }

@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 
 import requests
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
@@ -94,7 +94,15 @@ def chat(payload: Dict[str, Any]) -> Dict[str, Any]:
     provider = str(payload.get("provider", "openai"))
     if not message:
         raise HTTPException(status_code=400, detail="Message is required.")
-    return build_chat_response(provider, message, ChatConfig.from_env())
+    try:
+        return build_chat_response(provider, message, ChatConfig.from_env())
+    except HTTPException as exc:
+        return JSONResponse(status_code=exc.status_code, content={"error": exc.detail})
+    except requests.RequestException:
+        return JSONResponse(
+            status_code=502,
+            content={"error": "Upstream chat provider request failed."},
+        )
 
 
 @app.post("/api/email/send")
