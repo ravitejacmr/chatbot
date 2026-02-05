@@ -49,6 +49,8 @@ DELETE_EMAIL_PATTERN = re.compile(
     r"delete email\\s+(?P<message_id>[\\w-]+)", re.IGNORECASE
 )
 
+LIST_EMAILS_PATTERN = re.compile(r"list emails(?:\\s+(?P<query>.+))?$", re.IGNORECASE)
+
 
 def parse_chat_intent(message: str) -> Optional[Dict[str, str]]:
     send_match = SEND_EMAIL_PATTERN.search(message)
@@ -64,6 +66,13 @@ def parse_chat_intent(message: str) -> Optional[Dict[str, str]]:
         return {
             "intent": "delete_email",
             "message_id": delete_match.group("message_id").strip(),
+        }
+    list_match = LIST_EMAILS_PATTERN.search(message.strip())
+    if list_match:
+        query = list_match.group("query")
+        return {
+            "intent": "list_emails",
+            "query": query.strip() if query else "",
         }
     return None
 
@@ -140,6 +149,12 @@ def chat(payload: Dict[str, Any]) -> Dict[str, Any]:
             return {
                 "reply": "Delete request received.",
                 "action": mcp.delete_email(message_id=intent["message_id"]),
+            }
+        if intent and intent["intent"] == "list_emails":
+            mcp = GoogleWorkspaceMCP(WorkspaceConfig.from_env())
+            return {
+                "reply": "Listing emails.",
+                "action": mcp.list_emails(query=intent["query"]),
             }
         return build_chat_response(provider, message, ChatConfig.from_env())
     except HTTPException as exc:
